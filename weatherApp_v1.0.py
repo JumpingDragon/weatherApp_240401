@@ -5,6 +5,10 @@ from bs4 import BeautifulSoup
 from PyQt5 import uic
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+from PyQt5.QtCore import Qt
+
+import time
+import threading
 
 form_class = uic.loadUiType("ui/appUi.ui")[0]
 # ui 폴더 내의 디자인된 ui 불러오기
@@ -15,8 +19,14 @@ class WeatherApp(QMainWindow, form_class):
         self.setupUi(self)
         self.setWindowTitle("날씨 검색 프로그램")
         self.setWindowIcon(QIcon("icon/weather_icon.png"))
-        self.statusBar().showMessage("WEATHER SEARCH APP VER 0.6")
-        self.search_btn.clicked.connect(self.weather_search)
+        self.statusBar().showMessage("WEATHER SEARCH APP VER 1.0")
+        self.setWindowFlags(Qt.WindowStaysOnTopHint)    # 윈도우를 항상 맨 위로 유지시키자.
+
+        # self.search_btn.clicked.connect(self.weather_search)
+        self.search_btn.clicked.connect(self.refreshTimer)
+        # self.area_inpt.returnPressed.connect(self.weather_search)
+        self.area_inpt.returnPressed.connect(self.refreshTimer)
+        # 라인에디터 위에서 엔터키 이벤트가 발생하면 함수 호출 -> returnPressed
 
     def weather_search(self):
         try:
@@ -71,7 +81,7 @@ class WeatherApp(QMainWindow, form_class):
                 self.area_ttl.setText(areaText)
                 today_tempTextAll = weatherSoup.find("div",{"class":"temperature_text"}).text
                 today_tempTextAll = today_tempTextAll.strip()
-                print(today_tempTextAll)
+                # print(today_tempTextAll)
                 # today_tempText = today_tempTextAll[5:8].strip()
                 # print(today_tempText)
 
@@ -80,7 +90,7 @@ class WeatherApp(QMainWindow, form_class):
                 self.now_tmp.setText(temperTest)
 
                 todayWeatherText = weatherSoup.select("div.temperature_text>p.summary")[0].text
-                print(todayWeatherText)
+                # print(todayWeatherText)
                 todayWeatherText = todayWeatherText.strip()
                 self.setWeatherImage(todayWeatherText)
                 tempFeelsText = weatherSoup.select("p.summary>span.text>em")[0].text
@@ -134,6 +144,12 @@ class WeatherApp(QMainWindow, form_class):
             # ui에 준비된 label 이름에 이미지 출력하기
         else:
             self.weather_img.setText(weatherText)
+
+    def refreshTimer(self):         # 다시 크롤링을 해오는 타이머 함수
+        self.weather_search()       # 날씨 조회 함수 호출
+        threading.Timer(60, self.refreshTimer).start()
+
+
 
 
 
