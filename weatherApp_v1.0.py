@@ -21,6 +21,7 @@ class WeatherApp(QMainWindow, form_class):
         self.setWindowIcon(QIcon("icon/weather_icon.png"))
         self.statusBar().showMessage("WEATHER SEARCH APP VER 1.0")
         self.setWindowFlags(Qt.WindowStaysOnTopHint)    # 윈도우를 항상 맨 위로 유지시키자.
+        # self.weather_search() # 이렇게 하면 바로 현재 위치 나옴
 
         # self.search_btn.clicked.connect(self.weather_search)
         self.search_btn.clicked.connect(self.refreshTimer)
